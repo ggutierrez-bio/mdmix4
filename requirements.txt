@@ -1,11 +1,1 @@
 pyyaml
-numpy
-netCDF4
-#==0.18.1
-scipy
-
-# pytraj
-# parmed
-
-griddataformats
-#https://sourcesup.renater.fr/frs/?group_id=180&release_id=2467#stable-releases-_2.8.1-title-content
