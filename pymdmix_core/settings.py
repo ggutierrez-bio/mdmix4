@@ -54,7 +54,9 @@ class Settings:
         paths = [sys.prefix, os.path.join(sys.prefix, "local")]
         paths += site.PREFIXES
         paths += ["/usr", "/usr/local"]
-        paths = [mdmix_home] + [os.path.join(path, "mdmix") for path in paths]
+        paths = [os.path.join(path, "pymdmix") for path in paths]
+        if mdmix_home is not None:
+            paths = [mdmix_home] + paths
         return [path for path in paths if os.path.exists(path)]
 
     @staticmethod
