@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+
+import argparse
+
+from pymdmix.core import MDMix
+
+## si tiene 
+mdmix =  MDMix(config=args.config)
+
+mdmix.run(parametros)
