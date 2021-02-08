@@ -1,6 +1,6 @@
 import os
 import yaml
-from typing import Optional
+from typing import List, Optional
 import sys
 import site
 import logging
@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 class Settings:
     def __init__(self, filename: Optional[str] = None) -> None:
         super().__init__()
-        self.filename = self.get_defaults_filename()
+        self.filename = self.get_defaults_filename("pymdmix_core.yml")
+        logger.error(self.filename)
         self.data: dict = self.load_data(self.filename)
         self.get = self.data.get
         if filename is not None:
@@ -33,24 +34,28 @@ class Settings:
         self.filename = filename
 
     @staticmethod
-    def get_defaults_filename():
-        ligbinder_home = os.getenv("MDMIX_HOME")
+    def get_defaults_filename(filename: str) -> str:
+        home_candidates = Settings.get_mdmix_homes()
+        logger.info(f"Searching for mdmix home in: {home_candidates}")
+        configs = [os.path.join(path, filename) for path in home_candidates]
+        configs = [config for config in configs if os.path.exists(config)]
+        if len(configs) > 0:
+            logger.info(f"found configs: {configs}")
+            config = configs[0]
+            logger.info(f"Using {config} for default settings")
+            return config
+        else:
+            logger.warning(f"no config file found in default locations for {filename}. trying current folder")
+            return filename
+
+    @staticmethod
+    def get_mdmix_homes() -> List[str]:
+        mdmix_home = os.getenv("MDMIX_HOME")
         paths = [sys.prefix, os.path.join(sys.prefix, "local")]
         paths += site.PREFIXES
         paths += ["/usr", "/usr/local"]
-        home_candidates = [ligbinder_home]
-        home_candidates += [os.path.join(path, "mdmix") for path in paths]
-        logger.info(f"Searching for mdmix home in: {home_candidates}")
-        home_candidates = [
-            home
-            for home in home_candidates
-            if home is not None and os.path.exists(home)
-        ]
-        configs = [os.path.join(path, "default_config.yml") for path in home_candidates]
-        logger.info(f"found configs: {configs}")
-        config = next(iter([config for config in configs if os.path.exists(config)]), "config.yml")
-        logger.info(f"Using {config} for default settings")
-        return config
+        paths = [mdmix_home] + [os.path.join(path, "mdmix") for path in paths]
+        return [path for path in paths if os.path.exists(path)]
 
     @staticmethod
     def load_data(filename: str) -> dict:
