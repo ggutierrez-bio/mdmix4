@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
-        python3 -m pip install -r dev-requirements
+        python3 -m pip install -r dev-requirements.txt
         python3 -m pip install .
     - name: linting
       run: flake8
