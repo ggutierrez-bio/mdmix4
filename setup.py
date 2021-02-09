@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
 from setuptools import setup
-
-# Make sure I have the right Python version.
-if sys.version_info[:2] < (3, 8):
-    print("pyMDMix requires Python 3.7 or later. Python %d.%d detected" % sys.version_info[:2])
-    print("Please upgrade your version of Python.")
-    sys.exit(1)
 
 
 def getRequirements():
@@ -23,6 +16,7 @@ def getVersion():
 
 
 setup(
+    python_requires=">=3.8",
     name="pymdmix-core",
     zip_safe=False,
     version=getVersion(),
@@ -30,10 +24,9 @@ setup(
     author="ggutierrez-bio",
     author_email="",
     url="https://github.com/ggutierrez-bio/mdmix4",
-    packages=["pymdmix_core"],
+    packages=["pymdmix_core", "pymdmix_core.plugin"],
     inlcude_package_data=True,
     data_files=[("pymdmix", ["defaults/pymdmix_core.yml"])],
-    # package_dir={"pymdmix_core": "pymdmix_core"},
     scripts=["bin/mdmix"],
     install_requires=getRequirements(),
 )

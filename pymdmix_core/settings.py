@@ -13,10 +13,11 @@ logger = logging.getLogger(__name__)
 class Settings:
     def __init__(self, filename: Optional[str] = None) -> None:
         super().__init__()
-        self.filename = self.get_defaults_filename("pymdmix_core.yml")
-        logger.error(self.filename)
-        self.data: dict = self.load_data(self.filename)
+        self.defaults_filename = self.get_defaults_filename("pymdmix_core.yml")
+        self.files = [self.defaults_filename]
+        self.data: dict = self.load_data(self.defaults_filename)
         self.get = self.data.get
+        self.home = os.path.dirname(self.defaults_filename)
         if filename is not None:
             self.update_settings_with_file(filename)
 
@@ -31,7 +32,10 @@ class Settings:
 
     def update_settings_with_file(self, filename: str):
         self.merge(self.load_data(filename))
-        self.filename = filename
+        self.files.append(filename)
+
+    def get_file(self, filename: str):
+        return os.path.join(self.home, filename)
 
     @staticmethod
     def get_defaults_filename(filename: str) -> str:
