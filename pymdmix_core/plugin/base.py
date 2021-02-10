@@ -4,7 +4,7 @@ import argparse
 from abc import abstractmethod
 from importlib import import_module
 from pymdmix_core.settings import SETTINGS
-from pymdmix_core.parser import MDMIX_PARSER
+from pymdmix_core.parser import MDMIX_PARSER, get_mdmix_subparsers
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class Plugin:
         pass
 
     def add_subparser(self, parser: argparse.ArgumentParser):
-        subparser = parser.add_subparsers(dest='plugin')
+        subparser = get_mdmix_subparsers()
         parser = subparser.add_parser(self.NAME)
         self.init_parser(parser)
 

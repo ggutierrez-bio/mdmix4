@@ -1,20 +1,8 @@
-from argparse import ArgumentParser
-import sys
-
-
-class MDMixParser(ArgumentParser):
-
-    """
-    This class inherits from ArgumentParser to override the error function
-    """
-
-    def error(self, message: str) -> None:
-        self.print_help(sys.stderr)
-        return super().error(message)
+from argparse import ArgumentParser, _SubParsersAction
 
 
 def get_mdmix_parser():
-    parser = MDMixParser("MDMix")
+    parser = ArgumentParser("MDMix")
     parser.add_argument(
         "-c", "--config",
         help=(
@@ -35,11 +23,19 @@ def get_mdmix_parser():
         help="send the logging output to the specified file",
         default=None
     )
-    parser.add_argument(
-        "plugin",
-        help="name of the plugin to execute. use mdmix plugin list to get a list of available plugins"
-    )
+
     return parser
 
 
 MDMIX_PARSER = get_mdmix_parser()
+
+
+def get_mdmix_subparsers():
+    parser = MDMIX_PARSER
+    actions = parser._subparsers._actions if parser._subparsers is not None else []
+    return next(
+        iter(
+            [action for action in actions if isinstance(action, _SubParsersAction)],
+        ),
+        parser.add_subparsers(title="plugin", dest="plugin")
+    )
