@@ -44,9 +44,6 @@ class ListAction(PluginAction):
 
     ACTION_NAME = "list"
 
-    def init_parser(self, parser: ArgumentParser):
-        pass
-
     def run(self, args: Namespace) -> None:
         print("Available plugins:")
         for plugin_name in MDMIX_PLUGIN_MANAGER.plugins:

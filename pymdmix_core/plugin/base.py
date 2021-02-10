@@ -4,7 +4,7 @@ from argparse import ArgumentParser, Namespace
 from abc import abstractmethod
 from importlib import import_module
 from pymdmix_core.settings import SETTINGS
-from pymdmix_core.parser import MDMIX_PARSER, get_mdmix_subparsers
+from pymdmix_core.parser import MDMIX_PARSER, get_plugin_subparsers
 
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,6 @@ class PluginAction:
     def run(self, args: Namespace) -> None:
         pass
 
-    @abstractmethod
     def init_parser(self, parser: ArgumentParser):
         pass
 
@@ -30,6 +29,13 @@ class Plugin:
     LOAD_CONFIG: bool = False
     CONFIG_FILE: str = "pymdmix_core.yml"
 
+    def init_parser(self) -> None:
+        """
+        override this method to configure options for the plugin parser other than actions parsers.
+        plugin parser passed as parameter.
+        """
+        pass
+
     def __init__(self) -> None:
         self.load_config()
         self.actions: Dict[str, PluginAction] = {}
@@ -40,7 +46,7 @@ class Plugin:
         self.actions[action.ACTION_NAME] = action
 
     def add_subparser(self, parser: ArgumentParser):
-        subparser = get_mdmix_subparsers()
+        subparser = get_plugin_subparsers(parser)
         self.parser = subparser.add_parser(self.NAME)
         self.add_actions_parsers()
         self.init_parser()
@@ -51,18 +57,10 @@ class Plugin:
             parser = self.subparser.add_parser(action.ACTION_NAME)
             action.init_parser(parser)
 
-    def init_parser(self) -> None:
-        """
-        configure here options for the plugin parser other than actions parsers.
-        plugin parser passed as parameter.
-        """
-        pass
-
     def run(self, args: Namespace) -> None:
         action = self.actions.get(args.action)
         if action is not None:
             action.run(args)
-        pass
 
     def load_config(self) -> None:
         if self.LOAD_CONFIG:
