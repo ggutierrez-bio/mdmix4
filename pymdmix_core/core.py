@@ -28,7 +28,7 @@ class MDMix:
         if plugin is None:
             plugin_name = args.plugin
             plugins_list = list(self.plugin_manager.plugins.keys())
-            msg = f"Plugin f{plugin_name} is not in the list of available plugins: {plugins_list}"
+            msg = f"Plugin {plugin_name} is not in the list of available plugins: {plugins_list}"
             logger.critical(msg)
             MDMIX_PARSER.print_help(sys.stderr)
             raise KeyError(msg)
