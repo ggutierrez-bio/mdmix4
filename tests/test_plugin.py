@@ -4,7 +4,7 @@ from pymdmix_core.plugin import PluginManager
 from pymdmix_core.parser import get_mdmix_parser
 
 
-class TestAction1(PluginAction):
+class Action1(PluginAction):
 
     ACTION_NAME = "action1"
 
