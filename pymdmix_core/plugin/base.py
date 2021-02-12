@@ -1,8 +1,10 @@
-from typing import Dict, Type
+from typing import Dict, List, Type
 import logging
-from argparse import ArgumentParser, Namespace
+import sys
+from argparse import ArgumentParser, Namespace, _SubParsersAction
 from abc import abstractmethod
 from importlib import import_module
+
 from pymdmix_core.settings import SETTINGS
 from pymdmix_core.parser import MDMIX_PARSER, get_plugin_subparsers
 
@@ -14,12 +16,19 @@ class PluginAction:
 
     ACTION_NAME: str = "action"
 
+    def __init__(self, subparser: _SubParsersAction) -> None:
+        self.parser = subparser.add_parser(self.ACTION_NAME, parents=self.get_parents())
+        self.init_parser()
+
     @abstractmethod
     def run(self, args: Namespace) -> None:
         pass
 
-    def init_parser(self, parser: ArgumentParser):
+    def init_parser(self):
         pass
+
+    def get_parents(self) -> List[ArgumentParser]:
+        return []
 
 
 class Plugin:
@@ -28,6 +37,7 @@ class Plugin:
     HELP_STRING: str = "plugin help"
     LOAD_CONFIG: bool = False
     CONFIG_FILE: str = "pymdmix_core.yml"
+    ALLOW_EMPTY_ACTION = False
 
     def init_parser(self) -> None:
         """
@@ -36,30 +46,32 @@ class Plugin:
         """
         pass
 
-    def __init__(self) -> None:
+    def init_actions(self, action_subparser):
+        """
+        Override this method to initialize and register actions associated to this plugin.
+        This function will be called on super().__init__
+        """
+        pass
+
+    def __init__(self, master_parser: ArgumentParser) -> None:
         self.load_config()
         self.actions: Dict[str, PluginAction] = {}
-        self.parser = None
-        self.subparser = None
+        self.master_parser = master_parser
+        subparser = get_plugin_subparsers(self.master_parser)
+        self.parser = subparser.add_parser(self.NAME)
+        self.init_parser()
+        self.action_subparser = self.action_subparser = self.parser.add_subparsers(dest="action")
+        self.init_actions(self.action_subparser)
 
     def register_action(self, action: PluginAction):
         self.actions[action.ACTION_NAME] = action
 
-    def add_subparser(self, parser: ArgumentParser):
-        subparser = get_plugin_subparsers(parser)
-        self.parser = subparser.add_parser(self.NAME)
-        self.add_actions_parsers()
-        self.init_parser()
-
-    def add_actions_parsers(self):
-        self.subparser = self.parser.add_subparsers(dest="action")
-        for action in self.actions.values():
-            parser = self.subparser.add_parser(action.ACTION_NAME)
-            action.init_parser(parser)
-
     def run(self, args: Namespace) -> None:
         action = self.actions.get(args.action)
-        if action is not None:
+        if action is None:
+            self.parser.print_help(sys.stderr)
+            return
+        else:
             action.run(args)
 
     def load_config(self) -> None:
@@ -75,8 +87,7 @@ class PluginManager:
     def load_plugin(self, plugin_name: str):
         mod = import_module(plugin_name)
         plugin_class: Type[Plugin] = mod.get_plugin_class()
-        self.plugins[plugin_class.NAME] = plugin_class()
-        self.plugins[plugin_class.NAME].add_subparser(MDMIX_PARSER)
+        self.plugins[plugin_class.NAME] = plugin_class(MDMIX_PARSER)
 
 
 MDMIX_PLUGIN_MANAGER = PluginManager()

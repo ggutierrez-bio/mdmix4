@@ -8,7 +8,9 @@ from pymdmix_core.plugin.base import MDMIX_PLUGIN_MANAGER
 
 @patch.object(MDMIX_PLUGIN_MANAGER, 'plugins', {"test_plugin1": None, "test_plugin2": None})
 def test_list_action(capfd):
-    action = ListAction()
+    parser = ArgumentParser()
+    subparser = parser.add_subparsers(dest="action")
+    action = ListAction(subparser)
     action.run(None)
     output, _ = capfd.readouterr()
     expected_output = "Available plugins:\n\t- test_plugin1\n\t- test_plugin2\n"
@@ -16,15 +18,19 @@ def test_list_action(capfd):
 
 
 def test_load_action():
-    action = LoadAction()
+    parser = ArgumentParser()
+    subparser = parser.add_subparsers(dest="action")
+    action = LoadAction(subparser)
     with pytest.raises(NotImplementedError):
         action.run(None)
 
 
 def test_load_action_parser():
-    action = LoadAction()
     parser = ArgumentParser()
-    action.init_parser(parser)
+    subparser = parser.add_subparsers(dest="action")
+    action = LoadAction(subparser)
+    parser = ArgumentParser(subparser)
+    action.init_parser()
     # TODO: add asserts, and or parametrize the test
 
 

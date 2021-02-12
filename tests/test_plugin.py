@@ -1,4 +1,3 @@
-from argparse import ArgumentParser
 from pymdmix_core.plugin.base import Plugin, PluginAction
 from pymdmix_core.plugin import PluginManager
 from pymdmix_core.parser import get_mdmix_parser
@@ -7,9 +6,6 @@ from pymdmix_core.parser import get_mdmix_parser
 class Action1(PluginAction):
 
     ACTION_NAME = "action1"
-
-    def init_parser(self, parser: ArgumentParser):
-        pass
 
 
 class PluginFixture(Plugin):
@@ -34,8 +30,7 @@ def test_plugin():
     # define una clase plugin y una clase accion
     # crea un mdmix parser
     parser = get_mdmix_parser()
-    plugin = PluginFixture()
-    plugin.add_subparser(parser)
+    _ = PluginFixture(parser)
     # TODO:
     #   * add asserts
     #   * make the plugin do something

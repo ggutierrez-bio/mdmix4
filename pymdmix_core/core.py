@@ -46,8 +46,8 @@ class LoadAction(PluginAction):
 
     ACTION_NAME = "load"
 
-    def init_parser(self, parser: ArgumentParser):
-        parser.add_argument("plugin_module")
+    def init_parser(self):
+        self.parser.add_argument("plugin_module")
 
     def run(self, args: Namespace) -> None:
         raise NotImplementedError("This feature is not implemented _yet_")
@@ -57,7 +57,7 @@ class CorePlugin(Plugin):
 
     NAME = "plugin"
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.register_action(ListAction())
-        self.register_action(LoadAction())
+    def init_actions(self, action_subparser):
+        self.register_action(ListAction(action_subparser))
+        self.register_action(LoadAction(action_subparser))
+        
