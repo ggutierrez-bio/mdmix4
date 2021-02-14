@@ -55,6 +55,17 @@ class ActionRead(PluginAction):
         super().__init__(subparser)
         self.parent_plugin = parent_plugin
 
+    def init_parser(self):
+        super().init_parser()
+        self.parser.add_argument("id", action="append")
+
+    def run(self, args: Namespace) -> None:
+        session = self.parent_plugin.session
+        model_class = self.parent_plugin.CLASS
+        models = session.query(model_class).filter(model_class.id.in_(args.id)).all()
+        for model in models:
+            print(model)
+
 
 class ActionUpdate(PluginAction):
 

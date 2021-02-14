@@ -1,5 +1,6 @@
 import os
 from argparse import ArgumentParser
+from sqlalchemy.schema import Sequence
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,11 +12,12 @@ from .conftest import FPATH
 
 class FixtureClass(declarative_base()):
     __tablename__ = "fixture_class"
-    test_field1 = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence('fixture_ids', start=1, increment=1), primary_key=True)
+    test_field1 = Column(Integer)
     test_field2 = Column(String(32))
 
     def __repr__(self) -> str:
-        return f"FixtureModel. TF1 = {self.test_field1}, TF2 = {self.test_field2}"
+        return f"FixtureModel. id={self.id} TF1 = {self.test_field1}, TF2 = {self.test_field2}"
 
 
 class CRUDTestPlugin(CRUDPlugin):
@@ -37,6 +39,19 @@ def test_crud_plugin_loading(tmpdir):
     model: FixtureClass = session.query(FixtureClass).first()
     assert model.test_field1 == 42
     assert model.test_field2 == "foo"
+
+    config_file = os.path.join(FPATH, "fixture_crud_plugin", "input.json")
+    args = parser.parse_args(["test", "create", "-j", config_file])
+    crud_plugin.run(args)
+    assert len(session.query(FixtureClass).all()) == 2
+    model: FixtureClass = session.query(FixtureClass).all()[1]
+    assert model.test_field1 == 35
+    assert model.test_field2 == "bar"
+
     args = parser.parse_args(["test", "list"])
     crud_plugin.run(args)
-    # assert the stdout
+    # assert there are 2 lines in output
+
+    args = parser.parse_args(["test", "info", "2"])
+    crud_plugin.run(args)
+    # assert the stdout is the str representation of model with 35 and bar
