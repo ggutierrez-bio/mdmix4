@@ -55,3 +55,11 @@ def test_crud_plugin_loading(tmpdir):
     args = parser.parse_args(["test", "info", "2"])
     crud_plugin.run(args)
     # assert the stdout is the str representation of model with 35 and bar
+
+    args = parser.parse_args(["test", "info", "2", "1"])
+    crud_plugin.run(args)
+    # assert there are 2 lines in stdout
+
+    args = parser.parse_args(["test", "delete", "1", "2"])
+    crud_plugin.run(args)
+    assert len(session.query(FixtureClass).all()) == 0

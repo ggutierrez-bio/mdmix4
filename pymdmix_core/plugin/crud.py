@@ -32,6 +32,7 @@ class ActionCreate(PluginAction):
 
     def run(self, args: Namespace) -> None:
         model = self.parent_plugin.factory(args)
+        self.parent_plugin.session.commit()
         if model is None:
             logger.critical("Could not create model")
             exit(1)
@@ -57,7 +58,7 @@ class ActionRead(PluginAction):
 
     def init_parser(self):
         super().init_parser()
-        self.parser.add_argument("id", action="append")
+        self.parser.add_argument("id", nargs="+")
 
     def run(self, args: Namespace) -> None:
         session = self.parent_plugin.session
@@ -83,6 +84,17 @@ class ActionDelete(PluginAction):
     def __init__(self, subparser: _SubParsersAction, parent_plugin: 'CRUDPlugin') -> None:
         super().__init__(subparser)
         self.parent_plugin = parent_plugin
+
+    def init_parser(self):
+        super().init_parser()
+        self.parser.add_argument("id", nargs="+")
+
+    def run(self, args: Namespace) -> None:
+        session = self.parent_plugin.session
+        model_class = self.parent_plugin.CLASS
+        query = session.query(model_class).filter(model_class.id.in_(args.id))
+        query.delete(synchronize_session='fetch')
+        session.commit()
 
 
 class ActionList(PluginAction):
