@@ -1,6 +1,6 @@
 from pymdmix_core.plugin.base import PluginAction
 from typing import Optional
-from argparse import ArgumentParser, Namespace
+from argparse import Namespace
 import logging
 import sys
 from pymdmix_core.plugin import Plugin
@@ -60,4 +60,3 @@ class CorePlugin(Plugin):
     def init_actions(self, action_subparser):
         self.register_action(ListAction(action_subparser))
         self.register_action(LoadAction(action_subparser))
-        
