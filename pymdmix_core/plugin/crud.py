@@ -68,13 +68,15 @@ class ActionRead(PluginAction):
             print(model)
 
 
-class ActionUpdate(PluginAction):
-
-    ACTION_NAME = "update"
-
-    def __init__(self, subparser: _SubParsersAction, parent_plugin: 'CRUDPlugin') -> None:
-        super().__init__(subparser)
-        self.parent_plugin = parent_plugin
+# We will disallow this for now.
+#
+# class ActionUpdate(PluginAction):
+#
+#     ACTION_NAME = "update"
+#
+#     def __init__(self, subparser: _SubParsersAction, parent_plugin: 'CRUDPlugin') -> None:
+#         super().__init__(subparser)
+#         self.parent_plugin = parent_plugin
 
 
 class ActionDelete(PluginAction):
@@ -140,6 +142,7 @@ class CRUDPlugin(Plugin):
     def init_actions(self, action_subparser):
         self.register_action(ActionCreate(action_subparser, self))
         self.register_action(ActionRead(action_subparser, self))
-        self.register_action(ActionUpdate(action_subparser, self))
+        # disabled for now
+        # self.register_action(ActionUpdate(action_subparser, self))
         self.register_action(ActionDelete(action_subparser, self))
         self.register_action(ActionList(action_subparser, self))
