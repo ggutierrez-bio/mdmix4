@@ -33,7 +33,7 @@ MDMIX_PARSER = get_mdmix_parser()
 def get_plugin_subparsers(parser: ArgumentParser = None):
     parser = parser if parser is not None else MDMIX_PARSER
     actions = parser._subparsers._actions if parser._subparsers is not None else []
-    subparser =  next(
+    subparser = next(
         iter(
             [action for action in actions if isinstance(action, _SubParsersAction)],
         ),

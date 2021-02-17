@@ -1,4 +1,4 @@
-from typing import Dict, List, Type
+from typing import Dict, List, Optional, Type
 import logging
 import sys
 from argparse import ArgumentParser, Namespace, _SubParsersAction
@@ -81,13 +81,14 @@ class Plugin:
 
 class PluginManager:
 
-    def __init__(self) -> None:
+    def __init__(self, parser: Optional[ArgumentParser] = None) -> None:
         self.plugins: Dict[str, Plugin] = {}
+        self.parser = parser if parser is not None else MDMIX_PARSER
 
     def load_plugin(self, plugin_name: str):
         mod = import_module(plugin_name)
         plugin_class: Type[Plugin] = mod.get_plugin_class()
-        self.plugins[plugin_class.NAME] = plugin_class(MDMIX_PARSER)
+        self.plugins[plugin_class.NAME] = plugin_class(self.parser)
 
 
 MDMIX_PLUGIN_MANAGER = PluginManager()

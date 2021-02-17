@@ -35,9 +35,10 @@ def test_plugin():
     #   * add asserts
     #   * make the plugin do something
 
+
 def test_load_multiple_plugins():
     parser = get_mdmix_parser()
-    plugin_manager = PluginManager()
+    plugin_manager = PluginManager(parser)
     plugin_manager.load_plugin("pymdmix_core")
     plugin_manager.load_plugin("tests.fixture_plugin")
     assert len(plugin_manager.plugins) == 2
