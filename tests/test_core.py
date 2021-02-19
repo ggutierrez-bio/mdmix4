@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
-from unittest.mock import patch, Mock
-import pytest
+from unittest.mock import patch
 
 from pymdmix_core.core import ActionList, ActionLoad
 from pymdmix_core.parser import MDMIX_PARSER, get_mdmix_parser, get_plugin_subparsers
@@ -25,18 +24,5 @@ def test_load_action():
     subparser = get_plugin_subparsers()
     action = ActionLoad(subparser, plugin_manager)
     args = MDMIX_PARSER.parse_args(["plugin", "load", "tests.fixture_plugin"])
-    with pytest.raises(NotImplementedError):
-        action.run(args)
-
-
-def test_load_action_parser():
-    parser = ArgumentParser()
-    subparser = parser.add_subparsers(dest="action")
-    action = ActionLoad(subparser)
-    parser = ArgumentParser(subparser)
-    action.init_parser()
-    # TODO: add asserts, and or parametrize the test
-
-
-def test_core_plugin():
-    pass
+    action.run(args)
+    assert len(plugin_manager.plugins) == 2
