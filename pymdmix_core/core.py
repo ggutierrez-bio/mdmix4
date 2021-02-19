@@ -17,7 +17,7 @@ class MDMix:
             SETTINGS.update_settings_with_file(config)
 
         self.plugin_manager = MDMIX_PLUGIN_MANAGER
-        for plugin in SETTINGS["mdmix_core"]["installed_plugins"]:
+        for plugin in SETTINGS["pymdmix_core"]["installed_plugins"]:
             logger.info(f"loading plugin: {plugin}")
             self.plugin_manager.load_plugin(plugin)
 
@@ -71,7 +71,9 @@ class ActionAdd(ActionLoad):
             defaults = {}
             with open(defaults_file, 'r') as input_defaults_file:
                 defaults = yaml.full_load(input_defaults_file)
-            defaults["pymdmix_core"]["installed_plugins"].append(args.plugin_module)
+            installed = defaults["pymdmix_core"]["installed_plugins"]
+            if args.plugin_module not in installed:
+                installed.append(args.plugin_module)
             with open(defaults_file, 'w') as output_defaults_file:
                 yaml.dump(defaults, output_defaults_file)
         except Exception as e:
