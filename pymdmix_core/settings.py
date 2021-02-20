@@ -12,14 +12,11 @@ logger = logging.getLogger(__name__)
 
 class Settings:
     def __init__(self, filename: Optional[str] = None) -> None:
-        super().__init__()
-        self.defaults_filename = self.get_defaults_filename("pymdmix_core.yml")
+        self.defaults_filename = self.get_defaults_filename(filename)
         self.files = [self.defaults_filename]
         self.data: dict = self.load_data(self.defaults_filename)
         self.get = self.data.get
         self.home = os.path.dirname(self.defaults_filename)
-        if filename is not None:
-            self.update_settings_with_file(filename)
 
     def __getitem__(self, k):
         return self.data[k]
@@ -38,10 +35,13 @@ class Settings:
         return os.path.join(self.home, filename)
 
     @staticmethod
-    def get_defaults_filename(filename: str) -> str:
+    def get_defaults_filename(filename: Optional[str] = None) -> str:
+        filename = filename if filename is not None else "pymdmix_core.yml"
         home_candidates = Settings.get_mdmix_homes()
         logger.info(f"Searching for mdmix home in: {home_candidates}")
-        configs = [os.path.join(path, filename) for path in home_candidates]
+        configs = [filename]
+        if filename != os.path.abspath(filename):
+            configs += [os.path.join(path, filename) for path in home_candidates]
         configs = [config for config in configs if os.path.exists(config)]
         if len(configs) > 0:
             logger.info(f"found configs: {configs}")
