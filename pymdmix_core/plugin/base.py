@@ -60,7 +60,7 @@ class Plugin:
         subparser = get_plugin_subparsers(self.master_parser)
         self.parser = subparser.add_parser(self.NAME)
         self.init_parser()
-        self.action_subparser = self.parser.add_subparsers(dest="action")
+        self.action_subparser = self.parser.add_subparsers(dest="action", required=(not self.ALLOW_EMPTY_ACTION))
         self.init_actions(self.action_subparser)
 
     def register_action(self, action: PluginAction):
@@ -69,8 +69,9 @@ class Plugin:
     def run(self, args: Namespace) -> None:
         action = self.actions.get(args.action)
         if action is None:
-            self.parser.print_help(sys.stderr)
-            return
+            if not self.ALLOW_EMPTY_ACTION:
+                self.parser.print_help(sys.stderr)
+                raise ValueError("Action is mandatory")
         else:
             action.run(args)
 
