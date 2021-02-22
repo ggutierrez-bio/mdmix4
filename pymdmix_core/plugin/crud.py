@@ -65,7 +65,7 @@ class ActionRead(PluginAction):
         model_class = self.parent_plugin.CLASS
         models = session.query(model_class).filter(model_class.id.in_(args.id)).all()
         for model in models:
-            print(model)
+            print(model.__repr__())
 
 
 # We will disallow this for now.
