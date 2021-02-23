@@ -60,7 +60,9 @@ class Plugin:
         subparser = get_plugin_subparsers(self.master_parser)
         self.parser = subparser.add_parser(self.NAME)
         self.init_parser()
-        self.action_subparser = self.parser.add_subparsers(dest="action", required=(not self.ALLOW_EMPTY_ACTION))
+        self.action_subparser = None
+        if not self.ALLOW_EMPTY_ACTION:
+            self.action_subparser = self.parser.add_subparsers(dest="action", required=True)
         self.init_actions(self.action_subparser)
 
     def register_action(self, action: PluginAction):
